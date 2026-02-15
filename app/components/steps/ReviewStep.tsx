@@ -38,8 +38,8 @@ export default function ReviewStep() {
       const payload = { ...formData, duration };
 
       console.log("📦 Submitting formData with duration:", JSON.stringify(payload, null, 2));
-
-      const res = await fetch("http://localhost:5000/api/ai-plan", {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+      const res = await fetch(`${baseUrl}/api/ai-plan`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
