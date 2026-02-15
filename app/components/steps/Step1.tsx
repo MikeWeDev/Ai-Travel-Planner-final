@@ -3,7 +3,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import StepWrapper from "../StepWrapper";
 import { useFormContext } from "../../context/FormContext";
-import { Globe, AlertCircle, ShieldCheck, Zap } from "lucide-react";
+import { Globe , ShieldCheck, Zap } from "lucide-react";
 
 // --- YOUR CSV DATA ---
 const SUPPORTED_DATA = {
