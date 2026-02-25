@@ -55,6 +55,50 @@ function ItineraryContent() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const router = useRouter();
+  // Inside ItineraryContent function
+const [saving, setSaving] = useState(false);
+
+const saveToDb = async () => {
+  // 1. Guard Clause: Stop execution if data is null
+  if (!data) {
+    console.error("No itinerary data available to save.");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Please log in to save your itinerary!");
+    router.push("/auth/auth-login");
+    return;
+  }
+
+  setSaving(true);
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/itineraries/save`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}` 
+      },
+      // 2. TypeScript now knows 'data' is defined here
+      body: JSON.stringify({
+        title: data.title,
+        days: data.days,
+      }),
+    });
+
+    if (response.ok) {
+      alert("💾 Trip saved successfully!");
+    } else {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to save");
+    }
+  } catch (err: any) {
+    alert(err.message);
+  } finally {
+    setSaving(false);
+  }
+};
 
   const data: Itinerary | null =
     itinerary && isItinerary(itinerary) ? itinerary : localItinerary;
@@ -257,6 +301,15 @@ function ItineraryContent() {
         </button>
 
         <div className="flex gap-6 w-full justify-center">
+     
+       <button
+    onClick={saveToDb}
+    disabled={saving}
+    className="w-full px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg transition duration-300 disabled:opacity-50"
+  >
+    {saving ? "⏳ Saving..." : "💾 Save to Profile"}
+  </button>
+
           <button
             onClick={downloadPDF}
             className="flex-1 px-4 py-3 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500"
