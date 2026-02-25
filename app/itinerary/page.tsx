@@ -20,11 +20,23 @@ type Itinerary = {
   days: Day[];
 };
 
-const getFullImageUrl = (url: string): string => {
-  if (url.startsWith("http") || url.startsWith("data:")) return url;
-  return `https://ai-travel-planner-backend-w18v.onrender.com/images/${url.replace(/^\/?images\//, "")}`;
-};
 
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+
+const getFullImageUrl = (url: string): string => {
+  if (!url) return "";
+
+  // already absolute
+  if (url.startsWith("http") || url.startsWith("data:")) {
+    return url;
+  }
+
+  // ensure single /images path
+  const cleanPath = url.replace(/^\/?images\//, "");
+
+  return `${BACKEND_URL}/images/${cleanPath}`;
+};
 function isItinerary(obj: unknown): obj is Itinerary {
   return (
     !!obj &&
