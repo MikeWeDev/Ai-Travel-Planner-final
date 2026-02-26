@@ -55,7 +55,7 @@ export default function ItineraryDetail() {
   if (!data) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-black text-white p-6 md:p-12">
+    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-black text-white p-6 md:p-12 mt-10">
       <div className="max-w-4xl mx-auto">
         
         {/* Navigation */}

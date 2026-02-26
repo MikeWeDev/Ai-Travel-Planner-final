@@ -25,10 +25,13 @@ function StepRenderer() {
 export default function PlanPage() {
   return (
     <FormProvider>
-      <main
-        className="relative min-h-screen flex flex-col items-center justify-start px-4 py-12 overflow-hidden bg-gradient-to-tr from-indigo-900 via-purple-900 to-pink-900 text-white selection:bg-pink-400 selection:text-white"
-        role="main"
-      >
+     <main
+  className="relative flex flex-col items-center justify-start px-4  pb-12 
+            min-h-[90vh] overflow-y-auto mt-[10vh]
+             bg-gradient-to-tr from-indigo-900 via-purple-900 to-pink-900 
+             text-white selection:bg-pink-400 selection:text-white "
+  role="main"
+>
         {/* Expansive animated background blobs */}
         <div
           aria-hidden="true"
@@ -48,9 +51,9 @@ export default function PlanPage() {
           />
         </div>
 
-       <h1 className="text-4xl font-extrabold text-center w-full mb-1">
+      {/*<h1 className="text-4xl font-extrabold text-center w-full my-3">
   ✈️ Plan Your Dream Trip
-</h1>
+</h1>**/} 
 <StepRenderer />
 
       </main>

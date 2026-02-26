@@ -84,7 +84,7 @@ export default function Step3() {
 
   return (
     <StepWrapper>
-      <div className="relative min-h-screen flex items-center justify-center px-6 py-12 overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+      <div className="relative  flex items-center justify-center   overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
         {/* Background blurred glowing blobs */}
         <motion.div
           className="absolute rounded-full bg-purple-700 opacity-30 w-[340px] h-[340px] top-12 left-[-120px] filter blur-3xl animate-blob"

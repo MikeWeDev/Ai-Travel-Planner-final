@@ -24,8 +24,10 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-md border-b border-white/20">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<nav className="fixed top-0 left-0 right-0 z-50
+                bg-gradient-to-tr from-indigo-950/80 via-purple-950/70 to-pink-950/80
+                backdrop-blur-md border-b border-white/20">
+   <div className="max-w-7xl mx-auto px-6 h-[10vh] flex items-center justify-between">
         
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
@@ -37,8 +39,8 @@ export default function Navbar() {
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <Link href="/plan" className="hover:text-pink-400 transition">Plan Trip</Link>
-          <Link href="/about" className="hover:text-pink-400 transition">About</Link>
+          <Link href="/plan" className="hover:text-pink-400 transition text-white">Plan Trip</Link>
+          <Link href="/dashboard/about" className="hover:text-pink-400 transition text-white">About</Link>
           
           {isLoggedIn ? (
             <div className="flex items-center gap-4 border-l border-white/20 pl-6">
@@ -46,11 +48,11 @@ export default function Navbar() {
                 href="/dashboard" 
                 className="flex items-center gap-2 bg-indigo-600/50 hover:bg-indigo-600 px-4 py-2 rounded-full transition border border-white/10"
               >
-                <User size={18} />
-                <span>Dashboard</span>
+                <User size={18} color="white" />
+                <span className="text-white">Dashboard</span>
               </Link>
               <button onClick={handleLogout} className="text-white/60 hover:text-red-400 transition">
-                <LogOut size={18} />
+                <LogOut size={18} color="white" />
               </button>
             </div>
           ) : (

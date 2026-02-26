@@ -150,7 +150,7 @@ const saveToDb = async () => {
 
   if (error || !data) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center text-center px-4 bg-gradient-to-tr from-red-900 via-red-800 to-red-900">
+      <main className="min-h-screen flex flex-col items-center justify-center text-center px-4 bg-gradient-to-tr from-red-900 via-red-800 to-red-900 ">
         <h2 className="text-3xl font-extrabold text-red-400 mb-4">⚠️ Failed to Load Itinerary</h2>
         <p className="mb-6 text-red-300 max-w-md">
           {error || "Your itinerary could not be found. Please try planning a new trip."}
@@ -217,7 +217,7 @@ const saveToDb = async () => {
 
   return (
     <main
-      className="min-h-screen relative bg-gradient-to-tr from-indigo-900 via-purple-900 to-pink-900 text-white px-8 py-12 max-w-7xl mx-auto select-none"
+      className="min-h-screen relative bg-gradient-to-tr from-indigo-900 via-purple-900 to-pink-900 text-white px-8 py-12 max-w-7xl mx-auto select-none w-[100vw]"
       aria-live="polite"
     >
       {/* Background glowing circles */}

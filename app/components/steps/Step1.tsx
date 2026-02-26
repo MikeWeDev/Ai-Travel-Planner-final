@@ -31,7 +31,7 @@ export default function Step1() {
 
   return (
     <StepWrapper>
-      <div className="relative max-w-2xl mx-auto w-full rounded-3xl bg-indigo-900 bg-opacity-40 backdrop-blur-xl border border-white/30 shadow-2xl p-10">
+      <div className="relative w-[30vw] rounded-3xl bg-indigo-900 bg-opacity-40 backdrop-blur-xl border border-white/30 shadow-2xl p-9 ">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-4xl font-extrabold text-white mb-8 flex items-center gap-3 drop-shadow-lg">
             <Globe className="w-10 h-10 text-pink-400 animate-pulse" />
@@ -39,7 +39,7 @@ export default function Step1() {
           </h2>
         </motion.div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           {/* COUNTRY SELECT */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-pink-200">Country</label>
@@ -94,7 +94,7 @@ export default function Step1() {
           </div>
 
           {/* DYNAMIC FEEDBACK BOX */}
-          <div className="mt-4 min-h-[60px]">
+          <div className="mt-4 min-h-[40px]">
             {isOptimized ? (
               <motion.div 
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}

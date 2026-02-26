@@ -77,7 +77,7 @@ export default function ReviewStep() {
 
   return (
     <StepWrapper>
-      <div className="relative min-h-screen flex items-center justify-center px-6 py-12 overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+      <div className="relative  flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
         {/* Background blurred glowing blobs */}
         <motion.div
           className="absolute rounded-full bg-purple-700 opacity-30 w-[340px] h-[340px] top-16 left-[-120px] filter blur-3xl animate-blob"
@@ -100,7 +100,7 @@ export default function ReviewStep() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="relative z-10 w-full max-w-3xl bg-indigo-900 bg-opacity-40 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-12 shadow-2xl"
         >
-          <h2 className="text-3xl font-extrabold text-white text-center mb-10 drop-shadow-lg">
+          <h2 className="text-3xl font-extrabold text-white text-center mb-5 drop-shadow-lg">
             🔍 Review Your Trip Details
           </h2>
 

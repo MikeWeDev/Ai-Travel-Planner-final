@@ -34,14 +34,14 @@ export default function Step2() {
 
   return (
     <StepWrapper>
-      <div className="relative w-full min-h-screen flex items-center justify-center px-4">
+      <div className="relative w-[35vw] flex items-center justify-center p-5">
         <motion.div
           className="max-w-2xl w-full rounded-3xl bg-indigo-900 bg-opacity-40 backdrop-blur-xl border border-white/30 shadow-2xl p-10 animate-fade-in"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl font-extrabold text-white mb-10 flex items-center gap-3 drop-shadow-lg">
+          <h2 className="text-4xl font-extrabold text-white mb-5 flex items-center gap-3 drop-shadow-lg">
             📅 When are you traveling?
           </h2>
 
@@ -85,7 +85,7 @@ export default function Step2() {
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between mt-4">
               <button
                 onClick={() => setStep(1)}
                 className="px-6 py-3 rounded-2xl bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 font-medium shadow-sm"
