@@ -30,7 +30,7 @@ type Itinerary = {
   days: Day[];
 };
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 const getFullImageUrl = (url: string): string => {
   if (!url) return "";
