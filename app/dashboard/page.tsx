@@ -9,7 +9,7 @@ export default function Dashboard() {
   const [itineraries, setItineraries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
   useEffect(() => {
     console.log("🚀 Dashboard Component Mounted");
