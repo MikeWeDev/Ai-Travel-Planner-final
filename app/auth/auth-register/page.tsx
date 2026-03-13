@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 
-// ✅ Zod Schema (role removed)
+// ✅ Zod Schema
 const RegisterSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -25,12 +25,13 @@ export default function AuthRegisterPage() {
     resolver: zodResolver(RegisterSchema),
   });
 
-  // Submit Handler
+  const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   const onSubmit = async (data: RegisterSchemaType) => {
     setLoading(true);
     setError("");
     setSuccess("");
-  const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
     try {
       const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
@@ -53,98 +54,100 @@ export default function AuthRegisterPage() {
       setLoading(false);
     }
   };
-  
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-400 to-pink-500">
-      <div className="bg-white dark:bg-gray-900 shadow-2xl rounded-2xl p-10 w-full max-w-md">
-        <h1 className="text-3xl font-extrabold mb-6 text-center text-gray-900 dark:text-white">
-          Create Account
-        </h1>
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+      <div className="flex w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-gray-900">
+        
+        {/* Left Panel */}
+        <div className="hidden md:flex flex-col justify-center bg-gradient-to-b from-purple-600 to-pink-500 text-white p-16 w-1/2">
+          <h1 className="text-4xl font-extrabold mb-2">Welcome <span className="text-pink-200">Explorer</span>!</h1>
+          <p className="text-gray-100 mt-4">Start your journey by creating an account.</p>
+        </div>
 
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        {success && <p className="text-green-500 text-center mb-4">{success}</p>}
+        {/* Right Panel */}
+        <div className="w-full md:w-1/2 bg-gray-800 p-12 flex flex-col justify-center">
+          <h2 className="text-white text-2xl font-semibold mb-6">Create Account</h2>
+          <p className="text-gray-400 mb-6 text-sm">
+            Already have an account?{" "}
+            <span
+              onClick={() => router.push("/auth/auth-login")}
+              className="text-blue-500 cursor-pointer hover:underline"
+            >
+              Login
+            </span>
+          </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-          {/* Name */}
-          <div>
-            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">
-              Name
-            </label>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+          {success && <p className="text-green-500 mb-4">{success}</p>}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <input
               type="text"
+              placeholder="Full Name"
               {...register("name")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
+              className="p-3 rounded-lg bg-gray-900 border border-gray-700 placeholder-gray-500 text-white focus:ring-2 focus:ring-pink-400 focus:outline-none"
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
-          </div>
+            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
 
-          {/* Email */}
-          <div>
-            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">
-              Email
-            </label>
             <input
               type="email"
+              placeholder="Email Address"
               {...register("email")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
+              className="p-3 rounded-lg bg-gray-900 border border-gray-700 placeholder-gray-500 text-white focus:ring-2 focus:ring-pink-400 focus:outline-none"
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-          </div>
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
-          {/* Password */}
-          <div>
-            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">
-              Password
-            </label>
             <input
               type="password"
+              placeholder="Password"
               {...register("password")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
+              className="p-3 rounded-lg bg-gray-900 border border-gray-700 placeholder-gray-500 text-white focus:ring-2 focus:ring-pink-400 focus:outline-none"
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition flex items-center justify-center"
+            >
+              {loading && (
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              )}
+              {loading ? "Registering..." : "Register"}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center text-gray-400 text-sm">
+            <p>OR</p>
+            <button
+              onClick={() => alert("Google login")}
+              className="mt-2 flex items-center justify-center gap-2 border border-gray-700 rounded-lg p-3 w-full hover:bg-gray-700 transition"
+            >
+              <img src="/google-icon.svg" alt="Google" className="h-5 w-5" />
+              Continue with Google
+            </button>
           </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white font-bold p-3 rounded-lg transition"
-          >
-            {loading && (
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                ></path>
-              </svg>
-            )}
-            {loading ? "Registering..." : "Register"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-gray-600 dark:text-gray-300">
-          Already have an account?{" "}
-          <span
-            onClick={() => router.push("/auth/auth-login")}
-            className="text-purple-600 hover:underline cursor-pointer"
-          >
-            Login here
-          </span>
-        </p>
+        </div>
       </div>
     </div>
   );

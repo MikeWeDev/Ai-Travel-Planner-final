@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 
+// Updated Type to handle precise budget tracking
 type TravelForm = {
   country: string;
   city: string;
@@ -7,11 +8,14 @@ type TravelForm = {
   returnDate: Date | null;
   tripType?: "solo" | "couple" | "family" | "group";
   interests?: string[];
-  budget?: "low" | "medium" | "high";
+  // CHANGED: Budget is now an object instead of an enum string
+  budget?: {
+    amount: number;
+    category: string;
+  };
   duration?: number;
 };
 
-// Define a clear type for the itinerary (replace with your actual structure)
 type ItineraryDay = {
   day: number;
   activities: string[];
@@ -33,11 +37,14 @@ const FormContext = createContext<FormContextType | undefined>(undefined);
 
 export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   const [step, setStep] = useState(1);
+  
+  // Initial state updated to include the budget object structure
   const [formData, setFormDataState] = useState<TravelForm>({
     country: "",
     city: "",
     departureDate: null,
     returnDate: null,
+    budget: { amount: 0, category: "Economy (<$1k)" } 
   });
 
   const [itinerary, setItinerary] = useState<ItineraryDay[] | null>(null);

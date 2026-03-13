@@ -16,7 +16,6 @@ export default function AuthLoginPage() {
   });
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  // ✅ Check if user already logged in
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token");
@@ -66,85 +65,89 @@ export default function AuthLoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-purple-500">
-      <div className="bg-white dark:bg-gray-900 shadow-2xl rounded-2xl p-10 w-full max-w-md">
-        <h1 className="text-3xl font-extrabold mb-6 text-center text-gray-900 dark:text-white">
-          Welcome Back
-        </h1>
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+      <div className="flex w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-gray-900">
+        
+        {/* Left panel */}
+        <div className="hidden md:flex flex-col justify-center bg-gradient-to-b from-blue-600 to-blue-400 text-white p-16 w-1/2">
+          <h1 className="text-4xl font-extrabold mb-2">Welcome <span className="text-blue-200">Back</span>, Explorer.</h1>
+          <p className="text-gray-100 mt-4">Pick up where you left off.</p>
+        </div>
 
-        {error && (
-          <p className="text-red-500 text-center mb-4">{error}</p>
-        )}
+        {/* Right panel */}
+        <div className="w-full md:w-1/2 bg-gray-800 p-12 flex flex-col justify-center">
+          <h2 className="text-white text-2xl font-semibold mb-6">Login</h2>
+          <p className="text-gray-400 mb-6 text-sm">
+            New to the journey?{" "}
+            <span
+              onClick={() => router.push("/auth/auth-register")}
+              className="text-blue-500 cursor-pointer hover:underline"
+            >
+              Sign Up
+            </span>
+          </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-          <div>
-            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">
-              Email
-            </label>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <input
               type="email"
+              placeholder="Email Address"
               {...register("email")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              className="p-3 rounded-lg bg-gray-900 border border-gray-700 placeholder-gray-500 text-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
-          <div>
-            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">
-              Password
-            </label>
             <input
               type="password"
+              placeholder="Password"
               {...register("password")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              className="p-3 rounded-lg bg-gray-900 border border-gray-700 placeholder-gray-500 text-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
             />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition flex items-center justify-center"
+            >
+              {loading && (
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              )}
+              {loading ? "Logging in..." : "Resume Journey"}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center text-gray-400 text-sm">
+            <p>OR</p>
+            <button
+              onClick={() => alert("Google login")}
+              className="mt-2 flex items-center justify-center gap-2 border border-gray-700 rounded-lg p-3 w-full hover:bg-gray-700 transition"
+            >
+              <img src="/google-icon.svg" alt="Google" className="h-5 w-5" />
+              Continue with Google
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-lg transition"
-          >
-            {loading ? (
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                ></path>
-              </svg>
-            ) : null}
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-gray-600 dark:text-gray-300">
-          Don't have an account?{" "}
-          <span
-            onClick={() => router.push("/auth/auth-register")}
-            className="text-blue-600 hover:underline cursor-pointer"
-          >
-            Register here
-          </span>
-        </p>
+        </div>
       </div>
     </div>
   );

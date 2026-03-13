@@ -6,27 +6,20 @@ import "react-datepicker/dist/react-datepicker.css";
 import StepWrapper from "../StepWrapper";
 import { useFormContext } from "../../context/FormContext";
 import { motion } from "framer-motion";
+import { Calendar, Sparkles, ChevronLeft } from "lucide-react";
 
 export default function Step2() {
   const { formData, setFormData, setStep } = useFormContext();
 
   useEffect(() => {
     const { departureDate, returnDate, duration } = formData;
-
     if (departureDate && returnDate) {
       const start = new Date(departureDate);
       const end = new Date(returnDate);
-
       if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && end > start) {
-        const diffInDays = Math.ceil(
-          (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-        );
-
+        const diffInDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
         if (duration !== diffInDays) {
-          setFormData({
-            ...formData,
-            duration: diffInDays,
-          });
+          setFormData({ ...formData, duration: diffInDays });
         }
       }
     }
@@ -34,79 +27,114 @@ export default function Step2() {
 
   return (
     <StepWrapper>
-      <div className="relative w-[35vw] flex items-center justify-center p-5">
-        <motion.div
-          className="max-w-2xl w-full rounded-3xl bg-indigo-900 bg-opacity-40 backdrop-blur-xl border border-white/30 shadow-2xl p-10 animate-fade-in"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-4xl font-extrabold text-white mb-5 flex items-center gap-3 drop-shadow-lg">
-            📅 When are you traveling?
-          </h2>
-
-          <div className="flex flex-col gap-8">
-            {/* Departure Date Picker */}
-            <div>
-              <label className="block text-base font-semibold text-pink-200 mb-2 select-none">
-                Departure Date
-              </label>
-              <DatePicker
-                selected={formData.departureDate ?? null}
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    departureDate: date,
-                  })
-                }
-                className="w-full px-4 py-3 rounded-2xl bg-white bg-opacity-30 border border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300 text-black placeholder-black shadow-inner"
-                minDate={new Date()}
-                placeholderText="Select departure date"
-              />
+      {/* FIX: Removed fixed widths that cause X-axis overflow. 
+          The 'w-screen' and 'px-6' ensure it stays within the visible bounds.
+      */}
+      <div className="w-screen max-w-full flex flex-col items-center justify-center py-10 px-6 md:px-5">
+        
+        {/* GRID SYSTEM: 
+            Stacks vertically on mobile (col-1), 
+            Side-by-side on large screens (lg:grid-cols-2).
+        */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full max-w-[1500px]">
+          
+          {/* LEFT COLUMN: TITLE */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex flex-col items-start w-full"
+          >
+            <div className="w-16 h-1 bg-[#00a3cc] mb-6" />
+            <h2 className="text-5xl md:text-7xl xl:text-6xl font-black italic tracking-tighter leading-[0.9] uppercase text-white">
+              SELECT YOUR <br />
+              <span className="text-[#00a3cc] drop-shadow-[0_10px_30px_rgba(0,163,204,0.3)]">
+                TIMELINE.
+              </span>
+            </h2>
+            
+            <div className="mt-4 space-y-1">
+              <span className="text-gray-500 font-bold uppercase tracking-[0.4em] text-[10px]">
+                Expedition Clock
+              </span>
+              <div className="flex items-baseline gap-3">
+                <span className="text-4xl font-black italic text-white uppercase leading-none">
+                  {formData.duration || "00"}
+                </span>
+                <span className="text-[#00a3cc] font-bold uppercase tracking-widest text-xs italic">
+                  Days Calculated
+                </span>
+              </div>
             </div>
+          </motion.div>
 
-            {/* Return Date Picker */}
-            <div>
-              <label className="block text-base font-semibold text-pink-200 mb-2 select-none">
-                Return Date
-              </label>
-              <DatePicker
-                selected={formData.returnDate ?? null}
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    returnDate: date,
-                  })
-                }
-                className="w-full px-4 py-3 rounded-2xl bg-white bg-opacity-30 border border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300 text-black placeholder-black shadow-inner"
-                minDate={formData.departureDate ?? new Date()}
-                placeholderText="Select return date"
-              />
+          {/* RIGHT COLUMN: THE CARD */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full flex justify-center lg:justify-end "
+          >
+            {/* CARD WIDTH: Using 'w-full' with a 'max-w' 
+                ensures it never grows larger than the UI design but fits smaller screens.
+            */}
+            <div className="bg-[#1a1a1e] border border-white/10 rounded-[40px] p-8 md:p-8 shadow-2xl w-full max-w-[500px] flex flex-col gap-10">
+              
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#00a3cc]">
+                  Launch Date
+                </label>
+                <div className="relative border-b border-gray-800 focus-within:border-[#00a3cc] transition-all pb-2">
+                  <DatePicker
+                    selected={formData.departureDate ?? null}
+                    onChange={(date) => setFormData({ ...formData, departureDate: date })}
+                    className="w-full bg-transparent py-2 text-xl font-black italic uppercase text-white outline-none cursor-pointer"
+                    minDate={new Date()}
+                    placeholderText="MM / DD / YYYY"
+                  />
+                  <Calendar className="absolute right-0 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-700" />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">
+                  Return Date
+                </label>
+                <div className="relative border-b border-gray-800 focus-within:border-[#00a3cc] transition-all pb-2">
+                  <DatePicker
+                    selected={formData.returnDate ?? null}
+                    onChange={(date) => setFormData({ ...formData, returnDate: date })}
+                    className="w-full bg-transparent py-2 text-xl font-black italic uppercase text-white outline-none cursor-pointer"
+                    minDate={formData.departureDate ?? new Date()}
+                    placeholderText="MM / DD / YYYY"
+                  />
+                  <Calendar className="absolute right-0 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-700" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-5 pt-4">
+                <button
+                  onClick={() => setStep(3)}
+                  disabled={!formData.departureDate || !formData.returnDate}
+                  className={`w-full py-5 rounded-2xl font-black italic uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all duration-300
+                    ${!formData.departureDate || !formData.returnDate
+                      ? "bg-gray-800 text-gray-600 cursor-not-allowed opacity-30"
+                      : "bg-[#00a3cc] text-white hover:bg-[#00c2f3] shadow-[0_10px_25px_rgba(0,163,204,0.3)]"
+                    }`}
+                >
+                  Confirm Window
+                  <Sparkles size={16} />
+                </button>
+
+                <button
+                  onClick={() => setStep(1)}
+                  className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600 hover:text-white transition-colors"
+                >
+                  <ChevronLeft size={14} />
+                  Back to Coordinates
+                </button>
+              </div>
             </div>
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={() => setStep(1)}
-                className="px-6 py-3 rounded-2xl bg-gray-700 hover:bg-gray-600 text-white transition-all duration-300 font-medium shadow-sm"
-              >
-                ← Back
-              </button>
-
-              <button
-                onClick={() => setStep(3)}
-                disabled={!formData.departureDate || !formData.returnDate}
-                className={`px-6 py-3 rounded-2xl font-semibold shadow-md transition-all duration-300 ${
-                  !formData.departureDate || !formData.returnDate
-                    ? "bg-pink-800 text-pink-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-purple-600 hover:to-pink-500 text-white"
-                }`}
-              >
-                Next →
-              </button>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </StepWrapper>
   );

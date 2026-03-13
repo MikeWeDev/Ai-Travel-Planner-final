@@ -3,15 +3,15 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authenticatedFetch } from "../../../utilis/api"; 
-import { ChevronLeft, MapPin, Search, X } from "lucide-react";
+import { ChevronLeft, MapPin, Search, Sparkles, Navigation, Target, Activity as ActivityIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// --- NEW LEAFLET IMPORTS (Replaces Google Maps) ---
+// --- LEAFLET IMPORTS ---
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix for default marker icons in Leaflet + Next.js
+// Fix for default marker icons
 const DefaultIcon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
@@ -47,7 +47,6 @@ export default function ItineraryDetail() {
     if (id) fetchDetail();
   }, [id, router, BACKEND_URL]);
 
-  // EXTRACT ALL COORDINATES FOR THE MAP
   const allCoords = useMemo(() => {
     if (!data?.days) return [];
     return data.days.flatMap((day: any) => 
@@ -71,49 +70,66 @@ export default function ItineraryDetail() {
   }, [data, searchQuery]);
 
   if (loading) return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white">
-      <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p className="animate-pulse text-indigo-300">Unlocking Expedition Data...</p>
+    <div className="min-h-screen bg-[#0d0d0f] flex flex-col items-center justify-center text-white">
+      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }}>
+        <Sparkles size={48} className="text-[#00a3cc]" />
+      </motion.div>
+      <p className="mt-4 font-black italic uppercase tracking-[0.4em] text-[10px] text-gray-600">Retrieving Manifest...</p>
     </div>
   );
 
   if (!data) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-black text-white p-6 md:p-12 mt-10">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-[#0d0d0f] text-white p-6 md:p-12 pb-32">
+      <div className="max-w-6xl mx-auto pt-16">
         
-        {/* Navigation */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-          <button 
+        {/* Navigation & Search Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+          <motion.button 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
             onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-2 text-indigo-400 hover:text-pink-400 transition-all group"
+            className="flex items-center gap-4 text-gray-500 hover:text-white transition-all font-black italic uppercase text-xs group"
           >
-            <ChevronLeft size={24} /> 
-            <span className="font-bold">Back to Dashboard</span>
-          </button>
+            <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> 
+            Back to Mission Logs
+          </motion.button>
 
-          <div className="relative group w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400" size={18} />
+          <div className="relative group w-full md:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-[#00a3cc] transition-colors" size={16} />
             <input 
               type="text"
-              placeholder="Search Day or Title..."
+              placeholder="Filter Objectives..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-pink-500/50 text-sm"
+              className="w-full bg-[#1a1a1e] border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-[#00a3cc]/50 text-[10px] font-black italic uppercase tracking-widest transition-all"
             />
           </div>
         </div>
 
-        {/* Hero Header */}
-        <header className="mb-8">
-          <motion.h1 className="text-4xl md:text-6xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-pink-300">
-            {data.title}
+        {/* Tactical Title */}
+        <header className="mb-12">
+          <div className="w-12 h-1 bg-[#00a3cc] mb-6" />
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none"
+          >
+            {data.title.split(' ').map((word: string, i: number) => (
+              <span key={i} className={i % 2 !== 0 ? "text-[#00a3cc]" : ""}>{word} </span>
+            ))}
           </motion.h1>
         </header>
 
-        {/* 4. THE MAP VISUALIZATION SECTION (LEAFLET VERSION) */}
-        <section className="mb-12 h-[400px] w-full rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative z-0">
+        {/* THE MAP VISUALIZATION (Tactical Overlay) */}
+        <section className="mb-20 h-[500px] w-full rounded-[40px] overflow-hidden border border-white/5 shadow-2xl relative z-0">
+          <div className="absolute top-6 left-6 z-[1000] bg-[#0d0d0f]/80 backdrop-blur-md border border-white/10 p-3 rounded-xl">
+             <p className="text-[9px] font-black italic uppercase tracking-widest flex items-center gap-2">
+               <Navigation size={10} className="text-[#00a3cc]" /> Satellite Feed: Active
+             </p>
+          </div>
+          
           {allCoords.length > 0 ? (
             <MapContainer 
               center={[allCoords[0].lat, allCoords[0].lng]} 
@@ -122,20 +138,16 @@ export default function ItineraryDetail() {
               style={{ 
                 height: '100%', 
                 width: '100%',
-                // This filter creates a "Dark Mode" look for the standard OpenStreetMap tiles
                 filter: 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' 
               }}
             >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               
               {allCoords.map((coord: any, i: number) => (
                 <Marker key={i} position={[coord.lat, coord.lng]}>
                   <Popup>
-                    <div className="text-black">
-                      <strong className="block text-pink-600">Day Activity {i + 1}</strong>
+                    <div className="p-2 font-black italic uppercase text-[10px]">
+                      <span className="text-[#00a3cc] block mb-1">Objective {i + 1}</span>
                       {coord.name}
                     </div>
                   </Popup>
@@ -144,40 +156,53 @@ export default function ItineraryDetail() {
 
               <Polyline
                 positions={allCoords.map((c: any) => [c.lat, c.lng])}
-                pathOptions={{ color: '#ec4899', weight: 4, opacity: 0.8 }}
+                pathOptions={{ color: '#00a3cc', weight: 3, opacity: 0.8, dashArray: '10, 10' }}
               />
             </MapContainer>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-white/5 animate-pulse">
-              No coordinate data found for this expedition.
+            <div className="w-full h-full flex flex-col items-center justify-center bg-[#1a1a1e]">
+              <ActivityIcon size={32} className="text-gray-800 mb-4 animate-pulse" />
+              <p className="text-[10px] font-black italic uppercase tracking-widest text-gray-600">Zero Coordinate Data Found</p>
             </div>
           )}
         </section>
 
-        {/* Timeline Visualization */}
-        <div className="relative">
-          <div className="space-y-12">
+        {/* Timeline Visualization (Vertical Stepper) */}
+        <div className="max-w-4xl mx-auto">
+          <div className="relative border-l-2 border-dashed border-white/5 ml-4 md:ml-12 space-y-16">
             <AnimatePresence mode="popLayout">
               {filteredDays.map((day: any) => (
-                <motion.section key={day.day} className="relative pl-12 md:pl-24">
-                  <div className="absolute left-[9px] md:left-[25px] top-0 w-4 h-4 rounded-full bg-pink-500 shadow-[0_0_20px_rgba(236,72,153,0.5)] border-4 border-black" />
+                <motion.section 
+                  key={day.day} 
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="relative pl-12 md:pl-20"
+                >
+                  {/* Phase Marker */}
+                  <div className="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-[#0d0d0f] border-2 border-[#00a3cc] shadow-[0_0_15px_rgba(0,163,204,0.5)] z-10" />
                   
-                  <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-[2rem] hover:bg-white/10 transition-all">
-                    <div className="flex justify-between mb-8">
-                      <h2 className="text-2xl font-black text-white">Day {day.day}</h2>
-                      <span className="text-indigo-300 px-4 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-sm">
-                        {day.title}
-                      </span>
+                  <div className="bg-[#1a1a1e] border border-white/5 p-8 md:p-10 rounded-[40px] hover:border-[#00a3cc]/30 transition-all">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                      <div>
+                        <span className="text-[#00a3cc] text-[10px] font-black italic uppercase tracking-[0.3em] mb-2 block">Phase {day.day}</span>
+                        <h2 className="text-3xl font-black italic uppercase text-white leading-none">{day.title}</h2>
+                      </div>
+                      <div className="bg-white/5 px-4 py-2 rounded-xl border border-white/5">
+                        <p className="text-[9px] font-black italic uppercase tracking-widest text-gray-500">
+                          {day.activities.length} Waypoints
+                        </p>
+                      </div>
                     </div>
                     
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {day.activities.map((activity: any, idx: number) => (
-                        <div key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-black/20 border border-white/5">
-                          <MapPin size={18} className="mt-1 text-pink-500" />
+                        <div key={idx} className="flex items-start gap-4 p-5 rounded-2xl bg-black/20 border border-white/5 group hover:border-[#00a3cc]/20 transition-all">
+                          <Target size={16} className="mt-1 text-gray-700 group-hover:text-[#00a3cc] transition-colors" />
                           <div>
-                            <p className="font-bold text-white">{activity.name}</p>
-                            <p className="text-xs text-indigo-400">
-                              Lat: {activity.lat.toFixed(4)} | Lng: {activity.lng.toFixed(4)}
+                            <p className="text-[11px] font-bold text-gray-200 uppercase tracking-tight leading-relaxed">{activity.name}</p>
+                            <p className="text-[8px] font-black italic text-gray-600 uppercase tracking-tighter mt-1">
+                              LOC: {activity.lat.toFixed(4)} / {activity.lng.toFixed(4)}
                             </p>
                           </div>
                         </div>

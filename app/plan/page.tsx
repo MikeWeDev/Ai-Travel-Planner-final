@@ -25,37 +25,42 @@ function StepRenderer() {
 export default function PlanPage() {
   return (
     <FormProvider>
-     <main
-  className="relative flex flex-col items-center justify-start px-4  pb-12 
-            min-h-[90vh] overflow-y-auto mt-[10vh]
-             bg-gradient-to-tr from-indigo-900 via-purple-900 to-pink-900 
-             text-white selection:bg-pink-400 selection:text-white "
-  role="main"
->
-        {/* Expansive animated background blobs */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-0 -z-10"
-        >
-          <div
-            className="absolute top-16 left-[-150px] w-[350px] h-[350px] bg-pink-600 rounded-full filter blur-3xl opacity-40 animate-blob"
-            style={{ animationDelay: "0s" }}
-          />
-          <div
-            className="absolute bottom-24 right-[-180px] w-[400px] h-[400px] bg-indigo-700 rounded-full filter blur-4xl opacity-30 animate-blob"
-            style={{ animationDelay: "2s" }}
-          />
-          <div
-            className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-purple-800 rounded-full filter blur-4xl opacity-20 -translate-x-1/2 -translate-y-1/2 animate-blob"
-            style={{ animationDelay: "4s" }}
-          />
+      <main
+        className="relative flex flex-col items-center justify-start px-6 pb-12 
+             min-h-screen overflow-hidden pt-[15vh]
+             /* The base image: High contrast beach sunset */
+             bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop')] 
+             bg-cover bg-center bg-no-repeat bg-fixed
+             text-white selection:bg-[#00a3cc] selection:text-white"
+        role="main"
+      >
+        {/* LAYER 1: THE ATMOSPHERIC DARKENING 
+            This mimics the lighting in your image—darkening everything 
+            while letting the horizon glow slightly.
+        */}
+        <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+
+        {/* LAYER 2: THE BLUE/TEAL GRADIENT 
+            Notice how the right side of your image is very blue/dark teal. 
+            This adds that color cast back in.
+        */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/20 to-teal-900/40 pointer-events-none" />
+
+        {/* LAYER 3: VIGNETTE & FOCUS
+            This pushes the brightness to the left (horizon) and makes 
+            the corners deep and moody.
+        */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_transparent_0%,_black_80%)] opacity-70 pointer-events-none" />
+
+        {/* LAYER 4: GLASS BLUR 
+            This softens the background details so they don't distract.
+        */}
+        <div className="absolute inset-0 backdrop-blur-[1.5px] pointer-events-none" />
+
+        {/* Main Content Area */}
+        <div className="relative z-10 w-full flex flex-col items-center">
+          <StepRenderer />
         </div>
-
-      {/*<h1 className="text-4xl font-extrabold text-center w-full my-3">
-  ✈️ Plan Your Dream Trip
-</h1>**/} 
-<StepRenderer />
-
       </main>
     </FormProvider>
   );
