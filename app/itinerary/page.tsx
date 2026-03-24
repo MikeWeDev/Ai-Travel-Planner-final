@@ -14,9 +14,7 @@ import {
   Save, 
   FileText, 
   Search, 
-  MapPin, 
-  Clock,
-  ArrowRight
+  AlertTriangle
 } from "lucide-react";
 
 /* =====================================================
@@ -38,6 +36,11 @@ type Day = {
 type Itinerary = {
   title: string;
   days: Day[];
+};
+type BudgetRecommendation = {
+  suggestedDuration: number;
+  requiredBudget: number;
+  dailyAverage: number;
 };
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
@@ -71,6 +74,7 @@ function ItineraryContent() {
   const [search, setSearch] = useState("");
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [recommendation, setRecommendation] = useState<BudgetRecommendation | null>(null);
 
   const data: Itinerary | null = itinerary && isItinerary(itinerary) ? itinerary : localItinerary;
   const lowerSearch = search.toLowerCase();
@@ -112,18 +116,36 @@ function ItineraryContent() {
     finally { setSaving(false); }
   };
 
-  useEffect(() => {
+ useEffect(() => {
     const loadItinerary = () => {
       try {
         const saved = localStorage.getItem("lastItinerary");
         if (!saved) throw new Error("No itinerary found in localStorage.");
         const parsed = JSON.parse(saved);
-        if (!isItinerary(parsed)) throw new Error("Itinerary data is invalid.");
+
+        // 1. FIRST check if it is a budget rejection
+        if (parsed && parsed.status === "REJECTED") {
+          setError(parsed.message || "Insufficient Budget");
+          setRecommendation(parsed.recommendations || null);
+          setLoading(false);
+          return; // Exit here so we don't trigger the itinerary validator below
+        }
+
+        // 2. SECOND validate if it's a successful itinerary
+        if (!isItinerary(parsed)) {
+          throw new Error("Itinerary data is invalid.");
+        }
+
         setLocalItinerary(parsed);
-      } catch (err) { setError(err instanceof Error ? err.message : "Unknown error."); } 
-      finally { setLoading(false); }
+      } catch (err) { 
+        setError(err instanceof Error ? err.message : "Unknown error."); 
+      } finally { 
+        setLoading(false); 
+      }
     };
-    if (!itinerary) loadItinerary(); else setLoading(false);
+
+    if (!itinerary) loadItinerary(); 
+    else setLoading(false);
   }, [itinerary]);
 
   const downloadPDF = () => {
@@ -171,17 +193,51 @@ function ItineraryContent() {
       <p className="mt-4 font-black italic uppercase tracking-widest text-sm text-gray-500">Initializing Manifest...</p>
     </main>
   );
+if (error || !data) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center bg-[#0d0d0f] text-white p-6">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl w-full bg-[#1a1a1e] border border-white/5 rounded-[40px] p-12 text-center"
+        >
+          {recommendation ? (
+            <>
+              <div className="w-20 h-20 bg-orange-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-orange-500/20">
+                <AlertTriangle size={40} className="text-orange-500" />
+              </div>
+              <h2 className="text-4xl font-black italic uppercase text-white mb-4 leading-none">Budget Calibration</h2>
+              <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest mb-10 px-4">
+                {error}
+              </p>
 
-  if (error || !data) return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-[#0d0d0f] text-white p-6">
-      <h2 className="text-4xl font-black italic uppercase text-red-500 mb-2">Manifest Error</h2>
-      <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest mb-8">{error || "Data Corruption Detected"}</p>
-      <button onClick={() => router.push("/")} className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-black italic uppercase hover:bg-white/10 transition-all flex items-center gap-3">
-        <ChevronLeft size={16} /> Return to Base
-      </button>
-    </main>
-  );
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
+                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2">Option A: Reduce Days</p>
+                    <p className="text-3xl font-black italic text-[#00a3cc]">{recommendation.suggestedDuration} <span className="text-sm">DAYS</span></p>
+                </div>
+                <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
+                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2">Option B: Increase Budget</p>
+                    <p className="text-3xl font-black italic text-[#00a3cc]">${recommendation.requiredBudget} <span className="text-sm">TOTAL</span></p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="text-4xl font-black italic uppercase text-red-500 mb-2 leading-none">Manifest Error</h2>
+              <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest mb-10">{error || "Data Corruption Detected"}</p>
+            </>
+          )}
 
+          <button 
+            onClick={() => router.push("/")} 
+            className="w-full py-5 bg-white text-black rounded-2xl font-black italic uppercase hover:bg-[#00a3cc] hover:text-white transition-all flex items-center justify-center gap-3 text-xs"
+          >
+            <ChevronLeft size={18} /> Reconfigure Parameters
+          </button>
+        </motion.div>
+      </main>
+    );
+  }
   return (
     <main className="min-h-screen bg-[#0d0d0f] text-white pb-24">
       {/* HEADER SECTION */}

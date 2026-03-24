@@ -106,8 +106,9 @@ export default function Step3() {
                         }
                       }}
                       className="w-full bg-transparent border-b border-gray-800 text-white font-black italic uppercase py-2 outline-none focus:border-[#00a3cc] cursor-pointer"
-                    >
-                      <option value="500" className="bg-[#1a1a1e]">Economy (&lt; $1k)</option>
+                    >                   
+                       <option className="bg-[#1a1a1e]">Select Budget</option>
+                      <option value="500"  className="bg-[#1a1a1e]">Economy (&lt; $1k)</option>
                       <option value="2500" className="bg-[#1a1a1e]">Business ($1k - $5k)</option>
                       <option value="7500" className="bg-[#1a1a1e]">First Class ($5k+)</option>
                       <option value="custom" className="bg-[#1a1a1e]">Other (Custom Amount)</option>

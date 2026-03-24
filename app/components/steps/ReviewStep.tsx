@@ -29,11 +29,15 @@ export default function ReviewStep() {
     setError("");
     setLoading(true);
     try {
-      const { departureDate, returnDate } = formData;
+      const { departureDate, returnDate ,budget} = formData;
       if (!departureDate || !returnDate) throw new Error("Dates missing.");
 
       const duration = calculatedDuration ?? 1;
-      const payload = { ...formData, duration };
+    const payload = {
+      ...formData,
+       budget: formData.budget?.amount ?? 0,
+      duration,
+    };
 
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
       const res = await fetch(`${baseUrl}/api/ai-plan`, {
@@ -115,7 +119,7 @@ export default function ReviewStep() {
                   label="Budget Allocation" 
                   value={
                     formData.budget && typeof formData.budget === 'object'
-                      ? `${formData.budget.category} ($${formData.budget.amount.toLocaleString()})`
+                      ? `($${formData.budget.amount.toLocaleString()})`
                       : "N/A"
                   } 
                 />
@@ -129,7 +133,8 @@ export default function ReviewStep() {
             </div>
 
             {error && (
-              <p className="text-red-500 text-[10px] font-bold uppercase text-center animate-pulse border border-red-500/20 py-2 rounded-lg bg-red-500/5">
+              <p className="text-red-500 text-[15px] p-3
+              font-bold uppercase text-center animate-pulse border border-red-500/20 rounded-lg bg-red-500/5">
                 System Error: {error}
               </p>
             )}
@@ -165,7 +170,7 @@ function DataPoint({ label, value, icon, isFullWidth = false }: { label: string;
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1 flex items-center gap-2">
         {icon} {label}
       </p>
-      <p className="text-lg font-black italic uppercase text-white truncate">
+      <p className="text-lg font-black italic uppercase text-white ">
         {value}
       </p>
     </div>
