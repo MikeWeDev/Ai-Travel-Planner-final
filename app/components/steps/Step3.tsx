@@ -110,7 +110,7 @@ export default function Step3() {
                        <option className="bg-[#1a1a1e]">Select Budget</option>
                       <option value="500"  className="bg-[#1a1a1e]">Economy (&lt; $1k)</option>
                       <option value="2500" className="bg-[#1a1a1e]">Business ($1k - $5k)</option>
-                      <option value="7500" className="bg-[#1a1a1e]">First Class ($5k+)</option>
+                      <option value="5000" className="bg-[#1a1a1e]">First Class ($5k+)</option>
                       <option value="custom" className="bg-[#1a1a1e]">Other (Custom Amount)</option>
                     </select>
                   ) : (
