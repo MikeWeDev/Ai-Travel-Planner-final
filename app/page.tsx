@@ -4,30 +4,69 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkAuth } from "./lib/auth";
 import { motion } from "framer-motion";
-import { Sparkles, ShieldCheck, Activity } from "lucide-react";
+import { Sparkles, ShieldCheck, Activity, AlertCircle } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function init() {
-      // Small artificial delay to let the animation play (optional, good for UX)
-      const [result] = await Promise.all([
-        checkAuth(),
-        new Promise((resolve) => setTimeout(resolve, 500))
-      ]);
+ useEffect(() => {
+  let isMounted = true;
+
+  async function init() {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 600)); // animation delay
+
+      const result = await checkAuth();
+
+      if (!isMounted) return;
 
       if (result.authenticated) {
         router.replace("/plan");
       } else {
         router.replace("/auth/auth-login");
       }
+    } catch (err) {
+      console.error(err);
+      if (isMounted) {
+        router.replace("/auth/auth-login"); // fallback
+      }
     }
+  }
 
-    init();
-  }, [router]);
+  init();
 
+  return () => { isMounted = false; };
+}, [router]);
+  // Show error screen if authentication fails
+  if (error) {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center bg-[#0d0d0f] text-white p-6">
+        <div className="flex flex-col items-center text-center max-w-md">
+          <div className="mb-6 text-red-500">
+            <AlertCircle size={64} />
+          </div>
+          
+          <h2 className="text-2xl font-bold mb-3">Authentication Error</h2>
+          <p className="text-gray-400 mb-8">{error}</p>
+
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-[#00a3cc] hover:bg-[#00b8e6] transition-colors rounded-lg font-medium flex items-center gap-2"
+          >
+            Retry Connection
+          </button>
+
+          <p className="text-xs text-gray-600 mt-8">
+            Make sure your backend server is running
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Main loading screen (your original beautiful design)
   return (
     <div className="flex flex-col h-screen items-center justify-center bg-[#0d0d0f] text-white">
       <div className="relative flex items-center justify-center mb-12">
