@@ -25,24 +25,53 @@ export default function ReviewStep() {
     }
   }, [formData.departureDate, formData.returnDate]);
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
     setError("");
     setLoading(true);
     try {
-      const { departureDate, returnDate ,budget} = formData;
+      const { departureDate, returnDate, budget } = formData;
       if (!departureDate || !returnDate) throw new Error("Dates missing.");
 
+      // =========================================================================
+      // 🔥 FIX 1: Validate local session token before firing request
+      // =========================================================================
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
+
       const duration = calculatedDuration ?? 1;
-    const payload = {
-      ...formData,
-       budget: formData.budget?.amount ?? 0,
-      duration,
-    };
+      const payload = {
+        ...formData,
+        budget: formData.budget?.amount ?? 0,
+        duration,
+      };
+
+      // =========================================================================
+      // SAVE SEARCH CONTEXT FOR THE BACKGROUND REGENERATION LOOP
+      // =========================================================================
+      const structuralSearchContext = {
+        interests: formData.interests ?? [],
+        city: formData.city ?? "",
+        country: formData.country ?? "",
+        budget: formData.budget?.amount ?? 0,
+        days: duration
+      };
+      
+      localStorage.setItem(
+        "lastTripRequestInputParameters", 
+        JSON.stringify(structuralSearchContext)
+      );
+      // =========================================================================
 
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
       const res = await fetch(`${baseUrl}/api/ai-plan`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          // 🔥 FIX 2: Inject JWT authorization headers to verify user state context
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(payload),
       });
 
@@ -57,7 +86,6 @@ export default function ReviewStep() {
       setLoading(false);
     }
   };
-
   const formatDate = (date?: Date | string | null) => {
     if (!date) return "N/A";
     const d = new Date(date);

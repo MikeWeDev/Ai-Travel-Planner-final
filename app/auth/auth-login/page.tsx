@@ -137,16 +137,7 @@ export default function AuthLoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-gray-400 text-sm">
-            <p>OR</p>
-            <button
-              onClick={() => alert("Google login")}
-              className="mt-2 flex items-center justify-center gap-2 border border-gray-700 rounded-lg p-3 w-full hover:bg-gray-700 transition"
-            >
-              <img src="/google-icon.svg" alt="Google" className="h-5 w-5" />
-              Continue with Google
-            </button>
-          </div>
+          
         </div>
       </div>
     </div>

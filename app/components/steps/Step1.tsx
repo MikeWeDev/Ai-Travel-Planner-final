@@ -8,7 +8,6 @@ import { Globe, ShieldCheck, Zap, Sparkles } from "lucide-react";
 // --- YOUR CSV DATA ---
 const SUPPORTED_DATA = {
   Ethiopia: ["Addis Ababa", "Hawassa", "Bahir Dar", "Arba Minch", "Mekelle"],
-  Kenya: ["Nairobi", "Mombasa"],
 };
 
 export default function Step1() {
