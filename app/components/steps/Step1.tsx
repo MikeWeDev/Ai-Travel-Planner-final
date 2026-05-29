@@ -5,10 +5,34 @@ import StepWrapper from "../StepWrapper";
 import { useFormContext } from "../../context/FormContext";
 import { Globe, ShieldCheck, Zap, Sparkles } from "lucide-react";
 
-// --- YOUR CSV DATA ---
+// --- PRIMARY REGIONAL DATABASE ---
 const SUPPORTED_DATA = {
   Ethiopia: ["Addis Ababa", "Hawassa", "Bahir Dar", "Arba Minch", "Mekelle"],
 };
+
+// --- GLOBAL BACKUP DESTINATIONS (20 Top Global Hubs with strong African inclusion) ---
+const GLOBAL_DESTINATIONS = [
+  "Zanzibar, Tanzania",
+  "Marrakech, Morocco",
+  "Cairo, Egypt",
+  "Cape Town, South Africa",
+  "Nairobi, Kenya",
+  "Paris, France",
+  "Tokyo, Japan",
+  "Rome, Italy",
+  "New York City, USA",
+  "Bali, Indonesia",
+  "Dubai, UAE",
+  "London, UK",
+  "Sydney, Australia",
+  "Rio de Janeiro, Brazil",
+  "Bangkok, Thailand",
+  "Santorini, Greece",
+  "Kyoto, Japan",
+  "Barcelona, Spain",
+  "Machu Picchu, Peru",
+  "Reykjavik, Iceland"
+].sort(); // Sorted alphabetically for cleaner UX navigation
 
 export default function Step1() {
   const { formData, setFormData, setStep } = useFormContext();
@@ -45,7 +69,7 @@ export default function Step1() {
         </motion.div>
 
         <div className="flex flex-col gap-6">
-          {/* TARGET COORDINATES (Labels styled like the image) */}
+          {/* TARGET COORDINATES */}
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
               Target Coordinates
@@ -71,26 +95,32 @@ export default function Step1() {
             </div>
           </div>
 
-          {/* CITY INPUT / SELECT */}
+          {/* CITY SELECT / GLOBAL DROPDOWN */}
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
               Specific Landing Zone
             </label>
             <AnimatePresence mode="wait">
               {isOther ? (
-                <motion.input
-                  key="input"
+                /* ✅ CHANGED FROM TEXT INPUT TO ATTRACTIVE GLOBAL DROPDOWN OPTIONS */
+                <motion.select
+                  key="global-select"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  type="text"
-                  placeholder="TYPE ANY CITY..."
                   value={formData.city}
                   onChange={(e) =>
                     setFormData({ ...formData, city: e.target.value })
                   }
-                  className="w-full px-4 py-4 rounded-xl bg-[#2a2a2e] border-none text-white placeholder-gray-600 font-bold outline-none focus:ring-2 focus:ring-[#00a3cc] transition-all"
-                />
+                  className="w-full px-4 py-4 rounded-xl bg-[#2a2a2e] border-none text-white font-bold outline-none focus:ring-2 focus:ring-[#00a3cc] transition-all cursor-pointer"
+                >
+                  <option value="" className="bg-[#2a2a2e]">SELECT GLOBAL HUB</option>
+                  {GLOBAL_DESTINATIONS.map((dest) => (
+                    <option key={dest} value={dest} className="bg-[#2a2a2e]">
+                      {dest.toUpperCase()}
+                    </option>
+                  ))}
+                </motion.select>
               ) : (
                 <motion.select
                   key="select"
@@ -118,7 +148,7 @@ export default function Step1() {
             </AnimatePresence>
           </div>
 
-          {/* DYNAMIC FEEDBACK BOX - Styled to match the tech feel */}
+          {/* DYNAMIC FEEDBACK BOX */}
           <div className="min-h-[50px]">
             {isOptimized ? (
               <motion.div
@@ -136,12 +166,12 @@ export default function Step1() {
                 className="flex items-center gap-3 p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[11px] font-bold uppercase tracking-wider"
               >
                 <Zap className="w-4 h-4" />
-                <span>AI Global Mode: Estimating Coordinates...</span>
+                <span>AI Global Mode: Mapping External Framework Vectors...</span>
               </motion.div>
             ) : null}
           </div>
 
-          {/* ACTION BUTTON - Matches the "Initialize AI Itinerary" button */}
+          {/* ACTION BUTTON */}
           <motion.div className="mt-4">
             <button
               onClick={() => setStep(2)}
