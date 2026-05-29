@@ -33,7 +33,7 @@ export default function Navbar() {
             <Compass className="text-white group-hover:rotate-45 transition-transform" size={18} />
           </div>
           <span className="text-sm font-black italic tracking-[0.2em] text-white uppercase">
-            SmartTravel <span className="text-white/30 font-normal ml-1">// HQ</span>
+            Travel <span className="text-white/30 font-normal ml-1">// HQ</span>
           </span>
         </Link>
 
