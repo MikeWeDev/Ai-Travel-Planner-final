@@ -435,8 +435,18 @@ const downloadPDF = async () => {
               <ThumbsDown size={14} /> Reject Plan
             </button>
 
-           <Download size={14} /> 
-{downloadingPDF ? "Generating..." : "PDF"}
+          <button
+  onClick={downloadPDF}
+  disabled={downloadingPDF}
+  className="h-12 px-6 rounded-xl bg-white/5 border border-white/10 text-white font-black italic uppercase text-[10px] flex items-center gap-2 hover:bg-white/10 transition-all disabled:opacity-50"
+>
+  <Download size={14} />
+
+  {downloadingPDF 
+    ? "Generating..." 
+    : "PDF"
+  }
+</button>
             <button onClick={downloadTxt} className="h-12 px-6 rounded-xl bg-white/5 border border-white/10 text-white font-black italic uppercase text-[10px] flex items-center gap-2 hover:bg-white/10 transition-all">
               <FileText size={14} /> TXT
             </button>
