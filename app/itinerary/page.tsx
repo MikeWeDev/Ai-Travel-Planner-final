@@ -511,8 +511,11 @@ function ItineraryContent() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowRejectModal(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+onClick={() => {
+  if (!submittingReject) {
+    setShowRejectModal(false);
+  }
+}}              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             />
             
             <motion.div 
@@ -550,8 +553,11 @@ function ItineraryContent() {
                 <div className="flex gap-3">
                   <button
                     type="button"
-                    onClick={() => setShowRejectModal(false)}
-                    className="flex-1 py-4 bg-white/5 border border-white/10 rounded-xl font-black italic uppercase text-[10px] tracking-wider hover:bg-white/10 transition-all"
+      onClick={() => {
+  if (!submittingReject) {
+    setShowRejectModal(false);
+  }
+}}                    className="flex-1 py-4 bg-white/5 border border-white/10 rounded-xl font-black italic uppercase text-[10px] tracking-wider hover:bg-white/10 transition-all"
                   >
                     Abort
                   </button>
