@@ -430,6 +430,9 @@ function ItineraryContent() {
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-[#1a1a1e] border border-white/5 rounded-2xl px-16 py-6 text-white font-black italic uppercase outline-none focus:border-[#00a3cc] transition-all"
           />
+          <p className="mt-4 text-xs text-gray-500 font-bold uppercase tracking-widest">
+  Showing {filteredDays.length} of {data.days.length} travel days
+</p>
         </div>
 
         {/* ITINERARY GRID */}
