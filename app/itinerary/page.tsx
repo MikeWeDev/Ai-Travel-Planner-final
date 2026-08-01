@@ -289,30 +289,54 @@ function ItineraryContent() {
     else setLoading(false);
   }, [itinerary]);
 
- const downloadPDF = async () => {
+const downloadPDF = async () => {
+  if (!data) return;
+
   setDownloadingPDF(true);
-    if (!data) return;
+
+  try {
     const doc = new jsPDF();
+
     doc.setFontSize(16);
     doc.setTextColor("#00a3cc");
     doc.text(data.title, 14, 20);
+
     let y = 30;
+
     data.days.forEach((day: Day, index: number) => {
       doc.setFontSize(14);
-      doc.text(`Day ${day.day}: ${day.title}`, 14, y);
+
+      doc.text(
+        `Day ${day.day}: ${day.title}`,
+        14,
+        y
+      );
+
       autoTable(doc, {
         startY: y + 5,
         head: [["Activities"]],
         body: day.activities.map((a: Activity) => [a.name]),
         theme: "striped",
-        didDrawPage: (t) => { if (t.cursor) y = t.cursor.y + 10; },
+        didDrawPage: (t) => {
+          if (t.cursor) y = t.cursor.y + 10;
+        },
       });
-      if (index < data.days.length - 1 && y > 250) { doc.addPage(); y = 20; }
-    });
-    setDownloadingPDF(false);
-    doc.save("itinerary.pdf");
-  };
 
+      if (
+        index < data.days.length - 1 &&
+        y > 250
+      ) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+
+    doc.save("itinerary.pdf");
+
+  } finally {
+    setDownloadingPDF(false);
+  }
+};
   const downloadTxt = () => {
     if (!data) return;
     let text = `${data.title}\n\n`;
