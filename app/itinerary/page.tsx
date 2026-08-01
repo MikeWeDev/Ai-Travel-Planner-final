@@ -559,8 +559,11 @@ onClick={() => {
               className="relative w-full max-w-lg bg-[#1a1a1e] border border-white/10 rounded-[32px] p-8 md:p-10 shadow-2xl overflow-hidden"
             >
               <button 
-                onClick={() => setShowRejectModal(false)} 
-                className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
+onClick={() => {
+  if (!submittingReject) {
+    setShowRejectModal(false);
+  }
+}}                className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
               >
                 <X size={20} />
               </button>
