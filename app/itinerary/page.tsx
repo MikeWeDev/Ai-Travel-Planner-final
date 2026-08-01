@@ -335,8 +335,10 @@ const downloadPDF = async () => {
 
   } finally {
     setDownloadingPDF(false);
-  }
-};
+  } catch(error){
+ alert("Failed generating PDF");
+}
+}
   const downloadTxt = () => {
     if (!data) return;
     let text = `${data.title}\n\n`;
