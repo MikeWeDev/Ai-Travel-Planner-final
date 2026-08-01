@@ -74,7 +74,7 @@ function ItineraryContent() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [recommendation, setRecommendation] = useState<BudgetRecommendation | null>(null);
-
+ const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [submittingReject, setSubmittingReject] = useState(false);
@@ -289,7 +289,8 @@ function ItineraryContent() {
     else setLoading(false);
   }, [itinerary]);
 
-  const downloadPDF = () => {
+ const downloadPDF = async () => {
+  setDownloadingPDF(true);
     if (!data) return;
     const doc = new jsPDF();
     doc.setFontSize(16);
@@ -308,6 +309,7 @@ function ItineraryContent() {
       });
       if (index < data.days.length - 1 && y > 250) { doc.addPage(); y = 20; }
     });
+    setDownloadingPDF(false);
     doc.save("itinerary.pdf");
   };
 
@@ -409,9 +411,8 @@ function ItineraryContent() {
               <ThumbsDown size={14} /> Reject Plan
             </button>
 
-            <button onClick={downloadPDF} className="h-12 px-6 rounded-xl bg-white/5 border border-white/10 text-white font-black italic uppercase text-[10px] flex items-center gap-2 hover:bg-white/10 transition-all">
-              <Download size={14} /> PDF
-            </button>
+           <Download size={14} /> 
+{downloadingPDF ? "Generating..." : "PDF"}
             <button onClick={downloadTxt} className="h-12 px-6 rounded-xl bg-white/5 border border-white/10 text-white font-black italic uppercase text-[10px] flex items-center gap-2 hover:bg-white/10 transition-all">
               <FileText size={14} /> TXT
             </button>
