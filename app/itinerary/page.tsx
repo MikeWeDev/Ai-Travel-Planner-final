@@ -670,11 +670,13 @@ function ItineraryContent() {
                 <CheckCircle2 size={36} />
               </motion.div>
 
-              <h4 className="text-xl font-black italic uppercase text-white mb-2">Trip Saved Successfully</h4>
-              <p className="text-xs text-gray-400 font-medium mb-6">
-                The manifest file has been compiled and pinned directly onto your user profile framework.
-              </p>
+              <h4 className="text-xl font-black italic uppercase text-white mb-2">
+  Trip Saved Successfully
+</h4>
 
+<p className="text-xs text-gray-400 font-medium mb-6">
+  Your itinerary has been saved. Continue to your dashboard to manage your travel plans.
+</p>
             <button
   onClick={() => router.push("/dashboard")}
   className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black italic uppercase text-[10px] tracking-widest transition-all"
