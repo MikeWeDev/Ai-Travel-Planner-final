@@ -289,6 +289,7 @@ function ItineraryContent() {
     else setLoading(false);
   }, [itinerary]);
 
+  
 const downloadPDF = async () => {
   if (!data) return;
 
@@ -318,7 +319,9 @@ const downloadPDF = async () => {
         body: day.activities.map((a: Activity) => [a.name]),
         theme: "striped",
         didDrawPage: (t) => {
-          if (t.cursor) y = t.cursor.y + 10;
+          if (t.cursor) {
+            y = t.cursor.y + 10;
+          }
         },
       });
 
@@ -333,12 +336,16 @@ const downloadPDF = async () => {
 
     doc.save("itinerary.pdf");
 
+  } catch (error) {
+    console.error("PDF generation failed:", error);
+    alert("Failed generating PDF");
+
   } finally {
     setDownloadingPDF(false);
-  } catch(error){
- alert("Failed generating PDF");
-}
-}
+  }
+};
+
+
   const downloadTxt = () => {
     if (!data) return;
     let text = `${data.title}\n\n`;
