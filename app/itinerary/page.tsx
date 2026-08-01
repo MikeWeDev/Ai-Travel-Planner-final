@@ -675,12 +675,12 @@ function ItineraryContent() {
                 The manifest file has been compiled and pinned directly onto your user profile framework.
               </p>
 
-              <button
-                onClick={() => setShowSuccessAlert(false)}
-                className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black italic uppercase text-[10px] tracking-widest transition-all"
-              >
-                Acknowledge
-              </button>
+            <button
+  onClick={() => router.push("/dashboard")}
+  className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black italic uppercase text-[10px] tracking-widest transition-all"
+>
+  Acknowledge
+</button>
             </motion.div>
           </div>
         )}
