@@ -31,13 +31,11 @@ export default function Dashboard() {
     }
   };
 
-  const deleteItinerary = async (id: string) => {
+ const deleteItinerary = async (id: string) => {
     if (!confirm("Are you sure you want to delete this trip?")) return;
-    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${BACKEND_URL}/api/itineraries/${id}`, {
+      const res = await authenticatedFetch(`${BACKEND_URL}/api/itineraries/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         setItineraries(prev => prev.filter((it: any) => it._id !== id));
