@@ -5,7 +5,28 @@ import StepWrapper from "../StepWrapper";
 import { useFormContext } from "../../context/FormContext";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Sparkles, ChevronLeft, MapPin, Calendar, Fingerprint, Activity } from "lucide-react";
+import { Sparkles, ChevronLeft, MapPin, Calendar, Fingerprint, Activity, Loader2 } from "lucide-react";
+import { authenticatedFetch } from "../../utilis/api";
+
+interface DataPointProps {
+  label: string;
+  value: string;
+  icon?: React.ReactNode;
+  isFullWidth?: boolean;
+}
+
+function DataPoint({ label, value, icon, isFullWidth = false }: DataPointProps) {
+  return (
+    <div className={`${isFullWidth ? "col-span-full" : ""}`}>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1 flex items-center gap-2">
+        {icon} {label}
+      </p>
+      <p className="text-lg font-black italic uppercase text-white tracking-tight">
+        {value}
+      </p>
+    </div>
+  );
+}
 
 export default function ReviewStep() {
   const { formData, setStep } = useFormContext();
@@ -23,54 +44,51 @@ export default function ReviewStep() {
       const days = Math.max(Math.ceil((end - start) / (1000 * 60 * 60 * 24)), 1);
       setCalculatedDuration(days);
     }
-  }, [formData.departureDate, formData.returnDate])
+  }, [formData.departureDate, formData.returnDate]);
 
-  
-const handleSubmit = async () => {
-  setError("");
-  setLoading(true);
-  try {
-    const { departureDate, returnDate } = formData;
-    if (!departureDate || !returnDate) throw new Error("Dates missing.");
+  const handleSubmit = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const { departureDate, returnDate } = formData;
+      if (!departureDate || !returnDate) throw new Error("Dates missing.");
 
-    const duration = calculatedDuration ?? 1;
-    const payload = {
-      ...formData,
-      budget: formData.budget?.amount ?? 0,
-      duration,
-    };
+      const duration = calculatedDuration ?? 1;
+      const payload = {
+        ...formData,
+        budget: formData.budget?.amount ?? 0,
+        duration,
+      };
 
-    // Save search context for background loop
-    const structuralSearchContext = {
-      interests: formData.interests ?? [],
-      city: formData.city ?? "",
-      country: formData.country ?? "",
-      budget: formData.budget?.amount ?? 0,
-      days: duration
-    };
-    
-    localStorage.setItem(
-      "lastTripRequestInputParameters", 
-      JSON.stringify(structuralSearchContext)
-    );
+      const structuralSearchContext = {
+        interests: formData.interests ?? [],
+        city: formData.city ?? "",
+        country: formData.country ?? "",
+        budget: formData.budget?.amount ?? 0,
+        days: duration
+      };
+      
+      localStorage.setItem(
+        "lastTripRequestInputParameters", 
+        JSON.stringify(structuralSearchContext)
+      );
 
-    const res = await authenticatedFetch("/api/ai-plan", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
+      const res = await authenticatedFetch("/api/ai-plan", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.message || "Something went wrong.");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message || "Something went wrong.");
 
-    localStorage.setItem("lastItinerary", JSON.stringify(data));
-    router.push("/itinerary");
-  } catch (err: any) {
-    setError(err.message || "Something went wrong.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      localStorage.setItem("lastItinerary", JSON.stringify(data));
+      router.push("/itinerary");
+    } catch (err: any) {
+      setError(err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatDate = (date?: Date | string | null) => {
     if (!date) return "N/A";
@@ -147,8 +165,7 @@ const handleSubmit = async () => {
             </div>
 
             {error && (
-              <p className="text-red-500 text-[15px] p-3
-              font-bold uppercase text-center animate-pulse border border-red-500/20 rounded-lg bg-red-500/5">
+              <p className="text-red-500 text-[15px] p-3 font-bold uppercase text-center animate-pulse border border-red-500/20 rounded-lg bg-red-500/5">
                 System Error: {error}
               </p>
             )}
@@ -159,8 +176,17 @@ const handleSubmit = async () => {
                 disabled={loading}
                 className="w-full py-5 rounded-2xl bg-[#00a3cc] text-white font-black italic uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-[#00c2f3] transition-all shadow-[0_15px_30px_rgba(0,163,204,0.3)] disabled:opacity-50"
               >
-                {loading ? "Initializing..." : "Engage AI Planner"}
-                <Sparkles size={16} />
+                {loading ? (
+                  <>
+                    <span>Initializing...</span>
+                    <Loader2 size={16} className="animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    <span>Engage AI Planner</span>
+                    <Sparkles size={16} />
+                  </>
+                )}
               </button>
               
               <button
@@ -175,18 +201,5 @@ const handleSubmit = async () => {
         </motion.div>
       </div>
     </StepWrapper>
-  );
-}
-
-function DataPoint({ label, value, icon, isFullWidth = false }: { label: string; value: string; icon?: React.ReactNode; isFullWidth?: boolean }) {
-  return (
-    <div className={`${isFullWidth ? "col-span-full" : ""}`}>
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1 flex items-center gap-2">
-        {icon} {label}
-      </p>
-      <p className="text-lg font-black italic uppercase text-white ">
-        {value}
-      </p>
-    </div>
   );
 }
