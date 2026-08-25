@@ -23,69 +23,55 @@ export default function ReviewStep() {
       const days = Math.max(Math.ceil((end - start) / (1000 * 60 * 60 * 24)), 1);
       setCalculatedDuration(days);
     }
-  }, [formData.departureDate, formData.returnDate]);
+  }, [formData.departureDate, formData.returnDate])
 
- const handleSubmit = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      const { departureDate, returnDate, budget } = formData;
-      if (!departureDate || !returnDate) throw new Error("Dates missing.");
+  
+const handleSubmit = async () => {
+  setError("");
+  setLoading(true);
+  try {
+    const { departureDate, returnDate } = formData;
+    if (!departureDate || !returnDate) throw new Error("Dates missing.");
 
-      // =========================================================================
-      // 🔥 FIX 1: Validate local session token before firing request
-      // =========================================================================
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Your session has expired. Please log in again.");
-      }
+    const duration = calculatedDuration ?? 1;
+    const payload = {
+      ...formData,
+      budget: formData.budget?.amount ?? 0,
+      duration,
+    };
 
-      const duration = calculatedDuration ?? 1;
-      const payload = {
-        ...formData,
-        budget: formData.budget?.amount ?? 0,
-        duration,
-      };
+    // Save search context for background loop
+    const structuralSearchContext = {
+      interests: formData.interests ?? [],
+      city: formData.city ?? "",
+      country: formData.country ?? "",
+      budget: formData.budget?.amount ?? 0,
+      days: duration
+    };
+    
+    localStorage.setItem(
+      "lastTripRequestInputParameters", 
+      JSON.stringify(structuralSearchContext)
+    );
 
-      // =========================================================================
-      // SAVE SEARCH CONTEXT FOR THE BACKGROUND REGENERATION LOOP
-      // =========================================================================
-      const structuralSearchContext = {
-        interests: formData.interests ?? [],
-        city: formData.city ?? "",
-        country: formData.country ?? "",
-        budget: formData.budget?.amount ?? 0,
-        days: duration
-      };
-      
-      localStorage.setItem(
-        "lastTripRequestInputParameters", 
-        JSON.stringify(structuralSearchContext)
-      );
-      // =========================================================================
+    const res = await authenticatedFetch("/api/ai-plan", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
-      const res = await fetch(`${baseUrl}/api/ai-plan`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          // 🔥 FIX 2: Inject JWT authorization headers to verify user state context
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(payload),
-      });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || "Something went wrong.");
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Something went wrong.");
+    localStorage.setItem("lastItinerary", JSON.stringify(data));
+    router.push("/itinerary");
+  } catch (err: any) {
+    setError(err.message || "Something went wrong.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      localStorage.setItem("lastItinerary", JSON.stringify(data));
-      router.push("/itinerary");
-    } catch (err: any) {
-      setError(err.message || "Something went wrong.");
-    } finally {
-      setLoading(false);
-    }
-  };
+
   const formatDate = (date?: Date | string | null) => {
     if (!date) return "N/A";
     const d = new Date(date);
