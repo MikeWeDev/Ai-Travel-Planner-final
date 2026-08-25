@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, MapPin, Calendar, ArrowRight, Sparkles, Database, History } from "lucide-react";
+import { Trash2, MapPin, Calendar, ArrowRight, Sparkles, Database, History, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { authenticatedFetch } from "../../utilis/api";
 
 export default function Dashboard() {
   const [itineraries, setItineraries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
   const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -31,17 +32,26 @@ export default function Dashboard() {
     }
   };
 
- const deleteItinerary = async (id: string) => {
+  const deleteItinerary = async (id: string) => {
     if (!confirm("Are you sure you want to delete this trip?")) return;
+    setDeletingId(id);
+    
+    // Backup current state for rollback on error
+    const previousItineraries = [...itineraries];
+    setItineraries(prev => prev.filter((it: any) => it._id !== id));
+
     try {
       const res = await authenticatedFetch(`${BACKEND_URL}/api/itineraries/${id}`, {
         method: "DELETE",
       });
-      if (res.ok) {
-        setItineraries(prev => prev.filter((it: any) => it._id !== id));
+      if (!res.ok) {
+        setItineraries(previousItineraries);
       }
     } catch (err) {
       console.error("Delete Request Failed:", err);
+      setItineraries(previousItineraries);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -133,10 +143,11 @@ export default function Dashboard() {
                       Access Data <ArrowRight size={16} className="text-[#00a3cc]" />
                     </button>
                     <button 
+                      disabled={deletingId === it._id}
                       onClick={() => deleteItinerary(it._id)}
-                      className="p-4 text-gray-600 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
+                      className="p-4 text-gray-600 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all disabled:opacity-50"
                     >
-                      <Trash2 size={20} />
+                      {deletingId === it._id ? <Loader2 size={20} className="animate-spin text-red-500" /> : <Trash2 size={20} />}
                     </button>
                   </div>
                 </motion.div>
