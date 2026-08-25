@@ -6,27 +6,6 @@ import { useFormContext } from "../../context/FormContext";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Sparkles, ChevronLeft, MapPin, Calendar, Fingerprint, Activity, Loader2 } from "lucide-react";
-import { authenticatedFetch } from "../../utilis/api";
-
-interface DataPointProps {
-  label: string;
-  value: string;
-  icon?: React.ReactNode;
-  isFullWidth?: boolean;
-}
-
-function DataPoint({ label, value, icon, isFullWidth = false }: DataPointProps) {
-  return (
-    <div className={`${isFullWidth ? "col-span-full" : ""}`}>
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1 flex items-center gap-2">
-        {icon} {label}
-      </p>
-      <p className="text-lg font-black italic uppercase text-white tracking-tight">
-        {value}
-      </p>
-    </div>
-  );
-}
 
 export default function ReviewStep() {
   const { formData, setStep } = useFormContext();
@@ -53,6 +32,11 @@ export default function ReviewStep() {
       const { departureDate, returnDate } = formData;
       if (!departureDate || !returnDate) throw new Error("Dates missing.");
 
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+      }
+
       const duration = calculatedDuration ?? 1;
       const payload = {
         ...formData,
@@ -65,21 +49,26 @@ export default function ReviewStep() {
         city: formData.city ?? "",
         country: formData.country ?? "",
         budget: formData.budget?.amount ?? 0,
-        days: duration
+        days: duration,
       };
-      
+
       localStorage.setItem(
-        "lastTripRequestInputParameters", 
+        "lastTripRequestInputParameters",
         JSON.stringify(structuralSearchContext)
       );
 
-      const res = await authenticatedFetch("/api/ai-plan", {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+      const res = await fetch(`${baseUrl}/api/ai-plan`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Something went wrong.");
+      if (!res.ok) throw new Error(data?.message || "Failed to generate plan.");
 
       localStorage.setItem("lastItinerary", JSON.stringify(data));
       router.push("/itinerary");
@@ -93,13 +82,14 @@ export default function ReviewStep() {
   const formatDate = (date?: Date | string | null) => {
     if (!date) return "N/A";
     const d = new Date(date);
-    return isNaN(d.getTime()) ? "N/A" : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return isNaN(d.getTime())
+      ? "N/A"
+      : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
   return (
     <StepWrapper>
       <div className="w-full flex flex-col items-center justify-start py-4 px-6">
-        
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -117,49 +107,48 @@ export default function ReviewStep() {
           className="w-full max-w-[600px]"
         >
           <div className="bg-[#1a1a1e] border border-white/10 rounded-[40px] p-8 md:p-10 shadow-2xl flex flex-col gap-8">
-            
             <div className="grid grid-cols-1 gap-y-6">
-              <DataPoint 
+              <DataPoint
                 icon={<MapPin size={14} className="text-[#00a3cc]" />}
-                label="Target Destination" 
-                value={`${formData.city || "N/A"}, ${formData.country || "N/A"}`} 
+                label="Target Destination"
+                value={`${formData.city || "N/A"}, ${formData.country || "N/A"}`}
               />
-              
+
               <div className="grid grid-cols-2 gap-4">
-                <DataPoint 
+                <DataPoint
                   icon={<Calendar size={14} className="text-gray-500" />}
-                  label="Timeline" 
-                  value={`${formatDate(formData.departureDate)}`} 
+                  label="Timeline"
+                  value={`${formatDate(formData.departureDate)}`}
                 />
-                <DataPoint 
+                <DataPoint
                   icon={<Activity size={14} className="text-gray-500" />}
-                  label="Duration" 
-                  value={`${calculatedDuration ?? "..."} Standard Days`} 
+                  label="Duration"
+                  value={`${calculatedDuration ?? "..."} Standard Days`}
                 />
               </div>
 
               <div className="h-[1px] bg-white/5 w-full" />
 
               <div className="grid grid-cols-2 gap-4">
-                <DataPoint 
+                <DataPoint
                   icon={<Fingerprint size={14} className="text-gray-500" />}
-                  label="Unit Profile" 
-                  value={formData.tripType || "N/A"} 
+                  label="Unit Profile"
+                  value={formData.tripType || "N/A"}
                 />
-                <DataPoint 
+                <DataPoint
                   icon={<Fingerprint size={14} className="text-gray-500" />}
-                  label="Budget Allocation" 
+                  label="Budget Allocation"
                   value={
-                    formData.budget && typeof formData.budget === 'object'
+                    formData.budget && typeof formData.budget === "object"
                       ? `($${formData.budget.amount.toLocaleString()})`
                       : "N/A"
-                  } 
+                  }
                 />
               </div>
 
-              <DataPoint 
-                label="Selected Objectives" 
-                value={formData.interests?.length ? formData.interests.join(" • ") : "None"} 
+              <DataPoint
+                label="Selected Objectives"
+                value={formData.interests?.length ? formData.interests.join(" • ") : "None"}
                 isFullWidth
               />
             </div>
@@ -179,7 +168,7 @@ export default function ReviewStep() {
                 {loading ? (
                   <>
                     <span>Initializing...</span>
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={16} className="animate-spin text-white" />
                   </>
                 ) : (
                   <>
@@ -188,7 +177,7 @@ export default function ReviewStep() {
                   </>
                 )}
               </button>
-              
+
               <button
                 onClick={() => setStep(3)}
                 disabled={loading}
@@ -201,5 +190,26 @@ export default function ReviewStep() {
         </motion.div>
       </div>
     </StepWrapper>
+  );
+}
+
+function DataPoint({
+  label,
+  value,
+  icon,
+  isFullWidth = false,
+}: {
+  label: string;
+  value: string;
+  icon?: React.ReactNode;
+  isFullWidth?: boolean;
+}) {
+  return (
+    <div className={`${isFullWidth ? "col-span-full" : ""}`}>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1 flex items-center gap-2">
+        {icon} {label}
+      </p>
+      <p className="text-lg font-black italic uppercase text-white">{value}</p>
+    </div>
   );
 }
