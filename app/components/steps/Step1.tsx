@@ -1,16 +1,16 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import StepWrapper from "../StepWrapper";
 import { useFormContext } from "../../context/FormContext";
-import { Globe, ShieldCheck, Zap, Sparkles } from "lucide-react";
+import { ShieldCheck, Zap, Sparkles, ChevronDown } from "lucide-react";
 
 // --- PRIMARY REGIONAL DATABASE ---
 const SUPPORTED_DATA = {
   Ethiopia: ["Addis Ababa", "Hawassa", "Bahir Dar", "Arba Minch", "Mekelle"],
 };
 
-// --- GLOBAL BACKUP DESTINATIONS (20 Top Global Hubs with strong African inclusion) ---
+// --- GLOBAL BACKUP DESTINATIONS ---
 const GLOBAL_DESTINATIONS = [
   "Zanzibar, Tanzania",
   "Marrakech, Morocco",
@@ -37,6 +37,10 @@ const GLOBAL_DESTINATIONS = [
 export default function Step1() {
   const { formData, setFormData, setStep } = useFormContext();
 
+  // Element references to force open on box click
+  const countrySelectRef = useRef<HTMLSelectElement>(null);
+  const citySelectRef = useRef<HTMLSelectElement>(null);
+
   const isOther = formData.country === "Other";
 
   const isOptimized =
@@ -47,6 +51,20 @@ export default function Step1() {
 
   const handleCountryChange = (val: string) => {
     setFormData({ ...formData, country: val, city: "" });
+  };
+
+  const triggerSelect = (ref: React.RefObject<HTMLSelectElement | null>) => {
+    if (!ref.current) return;
+    // Modern browsers support showPicker(), fallback to click/focus
+    if ("showPicker" in HTMLSelectElement.prototype) {
+      try {
+        ref.current.showPicker();
+      } catch {
+        ref.current.focus();
+      }
+    } else {
+      ref.current.focus();
+    }
   };
 
   const canProceed = formData.country && formData.city;
@@ -75,23 +93,28 @@ export default function Step1() {
               Target Coordinates
             </label>
             
-            {/* COUNTRY SELECT */}
-            <div className="relative w-full">
+            {/* COUNTRY SELECT BOX */}
+            <div 
+              onClick={() => triggerSelect(countrySelectRef)}
+              className="relative w-full cursor-pointer flex items-center justify-between border-b-2 border-gray-800 py-3 focus-within:border-[#00a3cc] transition-all"
+            >
               <select
+                ref={countrySelectRef}
                 value={formData.country}
                 onChange={(e) => handleCountryChange(e.target.value)}
-                className="w-full px-4 py-3 bg-transparent border-b-2 border-gray-800 text-lg font-bold uppercase tracking-tight text-white focus:border-[#00a3cc] outline-none transition-all cursor-pointer pointer-events-auto select-none"
+                className="w-full bg-transparent text-lg font-bold uppercase tracking-tight text-white outline-none cursor-pointer appearance-none pr-8"
               >
-                <option value="" className="bg-[#1a1a1e]">WHERE TO NEXT?</option>
+                <option value="" className="bg-[#1a1a1e] text-white">WHERE TO NEXT?</option>
                 {Object.keys(SUPPORTED_DATA).map((c) => (
-                  <option key={c} value={c} className="bg-[#1a1a1e]">
+                  <option key={c} value={c} className="bg-[#1a1a1e] text-white">
                     {c}
                   </option>
                 ))}
-                <option value="Other" className="bg-[#1a1a1e] italic">
+                <option value="Other" className="bg-[#1a1a1e] text-white italic">
                   OTHER (GLOBAL SEARCH)
                 </option>
               </select>
+              <ChevronDown className="w-5 h-5 text-gray-400 absolute right-2 pointer-events-none" />
             </div>
           </div>
 
@@ -102,47 +125,65 @@ export default function Step1() {
             </label>
             <AnimatePresence mode="wait">
               {isOther ? (
-                <motion.select
-                  key="global-select"
+                <motion.div
+                  key="global-select-wrapper"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  value={formData.city}
-                  onChange={(e) =>
-                    setFormData({ ...formData, city: e.target.value })
-                  }
-                  className="w-full px-4 py-4 rounded-xl bg-[#2a2a2e] border-none text-white font-bold outline-none focus:ring-2 focus:ring-[#00a3cc] transition-all cursor-pointer pointer-events-auto block"
+                  onClick={() => triggerSelect(citySelectRef)}
+                  className="relative w-full cursor-pointer flex items-center justify-between bg-[#2a2a2e] rounded-xl px-4 py-4 focus-within:ring-2 focus-within:ring-[#00a3cc] transition-all"
                 >
-                  <option value="" className="bg-[#2a2a2e]">SELECT GLOBAL HUB</option>
-                  {GLOBAL_DESTINATIONS.map((dest) => (
-                    <option key={dest} value={dest} className="bg-[#2a2a2e]">
-                      {dest.toUpperCase()}
-                    </option>
-                  ))}
-                </motion.select>
-              ) : (
-                <motion.select
-                  key="select"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  disabled={!formData.country}
-                  value={formData.city}
-                  onChange={(e) =>
-                    setFormData({ ...formData, city: e.target.value })
-                  }
-                  className="w-full px-4 py-4 rounded-xl bg-[#2a2a2e] border-none text-white font-bold outline-none disabled:opacity-30 focus:ring-2 focus:ring-[#00a3cc] transition-all cursor-pointer pointer-events-auto block disabled:cursor-not-allowed"
-                >
-                  <option value="" className="bg-[#2a2a2e]">SELECT CITY</option>
-                  {formData.country &&
-                    SUPPORTED_DATA[
-                      formData.country as keyof typeof SUPPORTED_DATA
-                    ]?.map((city) => (
-                      <option key={city} value={city} className="bg-[#2a2a2e]">
-                        {city.toUpperCase()}
+                  <select
+                    ref={citySelectRef}
+                    value={formData.city}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                    className="w-full bg-transparent text-white font-bold outline-none cursor-pointer appearance-none pr-8"
+                  >
+                    <option value="" className="bg-[#2a2a2e] text-white">SELECT GLOBAL HUB</option>
+                    {GLOBAL_DESTINATIONS.map((dest) => (
+                      <option key={dest} value={dest} className="bg-[#2a2a2e] text-white">
+                        {dest.toUpperCase()}
                       </option>
                     ))}
-                </motion.select>
+                  </select>
+                  <ChevronDown className="w-5 h-5 text-gray-400 absolute right-4 pointer-events-none" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="select-wrapper"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => formData.country && triggerSelect(citySelectRef)}
+                  className={`relative w-full bg-[#2a2a2e] rounded-xl px-4 py-4 transition-all flex items-center justify-between ${
+                    !formData.country 
+                      ? "opacity-30 cursor-not-allowed" 
+                      : "cursor-pointer focus-within:ring-2 focus-within:ring-[#00a3cc]"
+                  }`}
+                >
+                  <select
+                    ref={citySelectRef}
+                    disabled={!formData.country}
+                    value={formData.city}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                    className="w-full bg-transparent text-white font-bold outline-none disabled:cursor-not-allowed cursor-pointer appearance-none pr-8"
+                  >
+                    <option value="" className="bg-[#2a2a2e] text-white">SELECT CITY</option>
+                    {formData.country &&
+                      SUPPORTED_DATA[
+                        formData.country as keyof typeof SUPPORTED_DATA
+                      ]?.map((city) => (
+                        <option key={city} value={city} className="bg-[#2a2a2e] text-white">
+                          {city.toUpperCase()}
+                        </option>
+                      ))}
+                  </select>
+                  <ChevronDown className="w-5 h-5 text-gray-400 absolute right-4 pointer-events-none" />
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
