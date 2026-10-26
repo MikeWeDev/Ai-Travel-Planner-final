@@ -17,12 +17,21 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 interface TacticalMapProps {
-  allCoords: Array<{ lat: number; lng: number; name: string }>;
+  allCoords: Array<{ lat: number | string; lng: number | string; name: string }>;
   activeDayParam: string | null;
 }
 
 export default function TacticalMap({ allCoords, activeDayParam }: TacticalMapProps) {
-  if (allCoords.length === 0) {
+  // ✅ FIX: Safely sanitize and parse all coordinates to numbers
+  const validCoords = (allCoords || [])
+    .map((coord) => ({
+      ...coord,
+      lat: typeof coord.lat === 'number' ? coord.lat : parseFloat(coord.lat as string),
+      lng: typeof coord.lng === 'number' ? coord.lng : parseFloat(coord.lng as string),
+    }))
+    .filter((coord) => !isNaN(coord.lat) && !isNaN(coord.lng));
+
+  if (validCoords.length === 0) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center bg-[#1a1a1e]">
         <ActivityIcon size={32} className="text-gray-800 mb-4 animate-pulse" />
@@ -36,7 +45,7 @@ export default function TacticalMap({ allCoords, activeDayParam }: TacticalMapPr
   return (
     <MapContainer 
       key={activeDayParam || "global"} 
-      center={[allCoords[0].lat, allCoords[0].lng]} 
+      center={[validCoords[0].lat, validCoords[0].lng]} 
       zoom={activeDayParam ? 14 : 12} 
       scrollWheelZoom={false}
       style={{ 
@@ -47,7 +56,7 @@ export default function TacticalMap({ allCoords, activeDayParam }: TacticalMapPr
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       
-      {allCoords.map((coord, i) => (
+      {validCoords.map((coord, i) => (
         <Marker key={i} position={[coord.lat, coord.lng]}>
           <Popup>
             <div className="p-2 font-black italic uppercase text-[10px]">
@@ -59,7 +68,7 @@ export default function TacticalMap({ allCoords, activeDayParam }: TacticalMapPr
       ))}
 
       <Polyline
-        positions={allCoords.map((c) => [c.lat, c.lng])}
+        positions={validCoords.map((c) => [c.lat, c.lng])}
         pathOptions={{ color: '#00a3cc', weight: 3, opacity: 0.8, dashArray: '10, 10' }}
       />
     </MapContainer>
