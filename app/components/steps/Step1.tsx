@@ -32,7 +32,7 @@ const GLOBAL_DESTINATIONS = [
   "Barcelona, Spain",
   "Machu Picchu, Peru",
   "Reykjavik, Iceland"
-].sort(); // Sorted alphabetically for cleaner UX navigation
+].sort();
 
 export default function Step1() {
   const { formData, setFormData, setStep } = useFormContext();
@@ -53,7 +53,7 @@ export default function Step1() {
 
   return (
     <StepWrapper>
-      {/* Main Container - Dark Charcoal with High Rounding */}
+      {/* Main Container */}
       <div className="relative w-[450px] rounded-[40px] bg-[#1a1a1e] border border-white/5 shadow-2xl p-10 font-sans text-white">
         
         {/* Header Section */}
@@ -76,11 +76,11 @@ export default function Step1() {
             </label>
             
             {/* COUNTRY SELECT */}
-            <div className="relative">
+            <div className="relative w-full">
               <select
                 value={formData.country}
                 onChange={(e) => handleCountryChange(e.target.value)}
-                className="w-full px-0 py-3 bg-transparent border-b-2 border-gray-800 text-lg font-bold uppercase tracking-tight text-white focus:border-[#00a3cc] outline-none transition-all appearance-none cursor-pointer"
+                className="w-full px-4 py-3 bg-transparent border-b-2 border-gray-800 text-lg font-bold uppercase tracking-tight text-white focus:border-[#00a3cc] outline-none transition-all cursor-pointer pointer-events-auto select-none"
               >
                 <option value="" className="bg-[#1a1a1e]">WHERE TO NEXT?</option>
                 {Object.keys(SUPPORTED_DATA).map((c) => (
@@ -102,7 +102,6 @@ export default function Step1() {
             </label>
             <AnimatePresence mode="wait">
               {isOther ? (
-                /* ✅ CHANGED FROM TEXT INPUT TO ATTRACTIVE GLOBAL DROPDOWN OPTIONS */
                 <motion.select
                   key="global-select"
                   initial={{ opacity: 0 }}
@@ -112,7 +111,7 @@ export default function Step1() {
                   onChange={(e) =>
                     setFormData({ ...formData, city: e.target.value })
                   }
-                  className="w-full px-4 py-4 rounded-xl bg-[#2a2a2e] border-none text-white font-bold outline-none focus:ring-2 focus:ring-[#00a3cc] transition-all cursor-pointer"
+                  className="w-full px-4 py-4 rounded-xl bg-[#2a2a2e] border-none text-white font-bold outline-none focus:ring-2 focus:ring-[#00a3cc] transition-all cursor-pointer pointer-events-auto block"
                 >
                   <option value="" className="bg-[#2a2a2e]">SELECT GLOBAL HUB</option>
                   {GLOBAL_DESTINATIONS.map((dest) => (
@@ -132,7 +131,7 @@ export default function Step1() {
                   onChange={(e) =>
                     setFormData({ ...formData, city: e.target.value })
                   }
-                  className="w-full px-4 py-4 rounded-xl bg-[#2a2a2e] border-none text-white font-bold outline-none disabled:opacity-30 focus:ring-2 focus:ring-[#00a3cc] transition-all cursor-pointer"
+                  className="w-full px-4 py-4 rounded-xl bg-[#2a2a2e] border-none text-white font-bold outline-none disabled:opacity-30 focus:ring-2 focus:ring-[#00a3cc] transition-all cursor-pointer pointer-events-auto block disabled:cursor-not-allowed"
                 >
                   <option value="" className="bg-[#2a2a2e]">SELECT CITY</option>
                   {formData.country &&
