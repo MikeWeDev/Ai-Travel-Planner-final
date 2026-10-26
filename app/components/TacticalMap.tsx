@@ -1,8 +1,7 @@
 "use client";
 
-import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import { Navigation, Activity as ActivityIcon } from "lucide-react";
+import { Activity as ActivityIcon } from "lucide-react";
 // @ts-ignore
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -22,7 +21,7 @@ interface TacticalMapProps {
 }
 
 export default function TacticalMap({ allCoords, activeDayParam }: TacticalMapProps) {
-  // ✅ FIX: Safely sanitize and parse all coordinates to numbers
+
   const validCoords = (allCoords || [])
     .map((coord) => ({
       ...coord,
