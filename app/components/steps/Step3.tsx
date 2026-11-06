@@ -7,13 +7,14 @@ import { useForm, Controller, SubmitHandler, Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Sparkles, ChevronLeft, Target, Wallet, Users } from "lucide-react";
+import { Sparkles, ChevronLeft, Target, Wallet, Users, AlertCircle } from "lucide-react";
 
 const schema = z.object({
   tripType: z.enum(["solo", "couple", "family", "group"]),
   interests: z.array(z.string()).min(1, "Select at least one interest"),
   budget: z.object({
-    amount: z.coerce.number().min(1, "Enter a valid amount"),
+    // 🟢 Changed minimum validation check to ensure amount is greater than 0
+    amount: z.coerce.number().min(1, "Please select or enter a valid budget allocation"),
     category: z.string(),
   }),
 });
@@ -30,13 +31,13 @@ const getBudgetCategory = (val: number) => {
 
 export default function Step3() {
   const { formData, setFormData, setStep } = useFormContext();
-  const [error, setError] = useState("");
   const [isCustom, setIsCustom] = useState(false);
 
+  // 🟢 Set default amount to 0 so it triggers the validation error if unselected
   const defaultValues = useMemo<FormData>(() => ({
     tripType: formData.tripType ?? "solo",
     interests: formData.interests ?? [],
-    budget: formData.budget ?? { amount: 500, category: "Economy (< $1k)" },
+    budget: formData.budget ?? { amount: 0, category: "Awaiting Input" },
   }), [formData]);
 
   const { control, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>({
@@ -93,22 +94,22 @@ export default function Step3() {
                   
                   {!isCustom ? (
                     <select 
-                      value={currentAmount}
+                      value={currentAmount === 0 ? "" : currentAmount}
                       onChange={(e) => {
                         const val = e.target.value;
                         if (val === "custom") {
                           setIsCustom(true);
-                          setValue("budget.amount", 0);
+                          setValue("budget.amount", 0, { shouldValidate: true });
                         } else {
                           const num = Number(val);
-                          setValue("budget.amount", num);
+                          setValue("budget.amount", num, { shouldValidate: true });
                           setValue("budget.category", getBudgetCategory(num));
                         }
                       }}
                       className="w-full bg-transparent border-b border-gray-800 text-white font-black italic uppercase py-2 outline-none focus:border-[#00a3cc] cursor-pointer"
                     >                   
-                       <option className="bg-[#1a1a1e]">Select Budget</option>
-                      <option value="500"  className="bg-[#1a1a1e]">Economy (&lt; $1k)</option>
+                      <option value="" disabled className="bg-[#1a1a1e]">Select Budget</option>
+                      <option value="500" className="bg-[#1a1a1e]">Economy (&lt; $1k)</option>
                       <option value="2500" className="bg-[#1a1a1e]">Business ($1k - $5k)</option>
                       <option value="5000" className="bg-[#1a1a1e]">First Class ($5k+)</option>
                       <option value="custom" className="bg-[#1a1a1e]">Other (Custom Amount)</option>
@@ -139,8 +140,8 @@ export default function Step3() {
                         type="button" 
                         onClick={() => {
                           setIsCustom(false);
-                          setValue("budget.amount", 500);
-                          setValue("budget.category", getBudgetCategory(500));
+                          setValue("budget.amount", 0, { shouldValidate: true });
+                          setValue("budget.category", getBudgetCategory(0));
                         }}
                         className="text-[9px] font-bold text-gray-500 uppercase hover:text-white ml-2"
                       >
@@ -148,9 +149,17 @@ export default function Step3() {
                       </button>
                     </div>
                   )}
-                  <span className="text-[9px] font-bold text-[#00a3cc] uppercase block mt-1">
-                    {getBudgetCategory(currentAmount)}
-                  </span>
+
+                  {/* 🟢 Dynamic error notification text for the budget field */}
+                  {errors.budget?.amount ? (
+                    <span className="text-[9px] font-bold text-red-500 uppercase flex items-center gap-1 mt-1">
+                      <AlertCircle size={10} /> {errors.budget.amount.message}
+                    </span>
+                  ) : (
+                    <span className="text-[9px] font-bold text-[#00a3cc] uppercase block mt-1">
+                      {getBudgetCategory(currentAmount)}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -185,6 +194,11 @@ export default function Step3() {
                     </div>
                   )}
                 />
+                {errors.interests && (
+                  <span className="text-[9px] font-bold text-red-500 uppercase flex items-center gap-1 mt-1">
+                    <AlertCircle size={10} /> {errors.interests.message}
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-col gap-4 pt-4">
